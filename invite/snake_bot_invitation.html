@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding Snake Bot Invitation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bungee:wght@400&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', monospace;
+            background: white;
+            color: black;
+        }
+
+        @media screen {
+            body {
+                padding: 20px;
+                background: linear-gradient(135deg, #ff6b35, #f7931e, #7209b7, #560bad);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+
+        .invitation {
+            width: 8.27in;
+            height: 11.69in;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            padding: 0.5in;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+
+        @media screen {
+            .invitation {
+                background: linear-gradient(45deg, 
+                    rgba(255, 20, 147, 0.1) 0%,
+                    rgba(0, 191, 255, 0.1) 25%,
+                    rgba(50, 205, 50, 0.1) 50%,
+                    rgba(255, 165, 0, 0.1) 75%,
+                    rgba(138, 43, 226, 0.1) 100%);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                border-radius: 15px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white !important;
+            }
+            .invitation {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                background: white !important;
+            }
+        }
+
+        /* Retro grid background */
+        .invitation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(100,100,100,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100,100,100,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 1;
+        }
+
+        @media print {
+            .invitation::before {
+                background-image: 
+                    linear-gradient(rgba(200,200,200,0.3) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(200,200,200,0.3) 1px, transparent 1px);
+            }
+        }
+
+        /* Palm trees silhouette */
+        .palm-trees {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 150'%3E%3Cpath d='M100 150V120c0-20 10-30 20-25 15 8 25-5 35 10 8 12-5 20-15 25-8 4-15 8-20 15-5 7-20 5-20 5z' fill='%23003d00'/%3E%3Cpath d='M120 125c-15-10-25-5-30 5-3 8 5 15 15 10 8-4 15-15 15-15z' fill='%23005500'/%3E%3Cpath d='M300 150V130c0-15 8-25 18-20 12 6 20-4 28 8 6 10-4 16-12 20-6 3-12 6-16 12-4 6-18 0-18 0z' fill='%23003d00'/%3E%3Cpath d='M600 150V125c0-18 12-28 22-23 14 7 23-3 33 12 7 11-3 18-13 23-7 4-14 7-18 13-4 6-24 0-24 0z' fill='%23003d00'/%3E%3C/svg%3E") no-repeat center bottom;
+            background-size: cover;
+            z-index: 2;
+            opacity: 0.6;
+        }
+
+        .content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-family: 'Bungee', cursive;
+            font-size: 2.5rem;
+            color: #8B008B;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        @media screen {
+            .title {
+                background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+                background-size: 200% 200%;
+                animation: rainbow 3s ease-in-out infinite;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-shadow: 0 0 20px rgba(255,0,255,0.5);
+                transform: perspective(500px) rotateX(15deg);
+            }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #0066CC;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        @media screen {
+            .subtitle {
+                color: #00ffff;
+                text-shadow: 0 0 10px rgba(0,255,255,0.7);
+            }
+        }
+
+        @keyframes rainbow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .main-text {
+            background: rgba(240,240,240,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #8B008B;
+            margin: 15px 0;
+        }
+
+        @media screen {
+            .main-text {
+                background: rgba(0,0,0,0.7);
+                box-shadow: 0 0 20px rgba(255,0,255,0.3);
+            }
+        }
+
+        .main-text p {
+            color: #000;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        @media screen {
+            .main-text p {
+                color: #ffffff;
+                font-size: 1.1rem;
+                text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            }
+        }
+
+        .highlight {
+            color: #CC0000;
+            font-weight: 700;
+        }
+
+        @media screen {
+            .highlight {
+                color: #00ff00;
+                text-shadow: 0 0 10px rgba(0,255,0,0.7);
+            }
+        }
+
+        .event-details {
+            background: rgba(240,240,240,0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #0066CC;
+            margin: 15px 0;
+        }
+
+        @media screen {
+            .event-details {
+                background: rgba(0,0,0,0.8);
+                box-shadow: 0 0 15px rgba(0,255,255,0.3);
+            }
+        }
+
+        .event-details h3 {
+            color: #CC6600;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        @media screen {
+            .event-details h3 {
+                color: #ffff00;
+                text-shadow: 0 0 10px rgba(255,255,0,0.7);
+            }
+        }
+
+        .event-details p {
+            color: #000;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        @media screen {
+            .event-details p {
+                color: #ffffff;
+            }
+        }
+
+        .snake-figure {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 200px;
+            z-index: 4;
+        }
+
+        .snake-body {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #00ff00, #ffff00);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 10px rgba(0,255,0,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .snake-body:nth-child(1) { top: 0px; left: 10px; animation-delay: 0s; }
+        .snake-body:nth-child(2) { top: 18px; left: 20px; animation-delay: 0.2s; }
+        .snake-body:nth-child(3) { top: 36px; left: 10px; animation-delay: 0.4s; }
+        .snake-body:nth-child(4) { top: 54px; left: 0px; animation-delay: 0.6s; }
+        .snake-body:nth-child(5) { top: 72px; left: 10px; animation-delay: 0.8s; }
+        .snake-body:nth-child(6) { top: 90px; left: 20px; animation-delay: 1s; }
+        .snake-body:nth-child(7) { top: 108px; left: 10px; animation-delay: 1.2s; }
+        .snake-body:nth-child(8) { top: 126px; left: 0px; animation-delay: 1.4s; }
+
+        .snake-head {
+            width: 25px;
+            height: 25px;
+            background: linear-gradient(45deg, #ff0000, #ff6600);
+            border-radius: 50%;
+            position: absolute;
+            top: -5px;
+            left: 8px;
+            box-shadow: 0 0 15px rgba(255,0,0,0.7);
+            animation: headPulse 1.5s ease-in-out infinite;
+        }
+
+        .snake-head::before {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            top: 6px;
+            left: 6px;
+        }
+
+        .snake-head::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            top: 6px;
+            right: 6px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes headPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255,0,0,0.7); }
+            50% { transform: scale(1.3); box-shadow: 0 0 25px rgba(255,0,0,1); }
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .signature p {
+            color: #000;
+            font-size: 0.8rem;
+            margin: 4px 0;
+        }
+
+        @media screen {
+            .signature p {
+                color: #ffffff;
+                text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            }
+        }
+
+        .ai-note {
+            font-size: 0.6rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media screen {
+            .ai-note {
+                color: #888;
+            }
+        }
+
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.5in;
+            }
+            
+            .particle {
+                display: none;
+            }
+            
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 0 6px rgba(0,255,255,0.8);
+        }
+
+        .particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 60%; left: 20%; animation-delay: 2s; }
+        .particle:nth-child(3) { top: 30%; left: 80%; animation-delay: 4s; }
+        .particle:nth-child(4) { top: 80%; left: 70%; animation-delay: 1s; }
+        .particle:nth-child(5) { top: 15%; left: 60%; animation-delay: 3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+            50% { transform: translateY(-20px) scale(1.5); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invitation">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        
+        <div class="palm-trees"></div>
+        
+        <div class="content">
+            <div class="header">
+                <div class="title">VIBE CODING</div>
+                <div class="subtitle">🐍 SNAKE BOT BATTLE 🐍</div>
+            </div>
+
+            <div class="main-text">
+                <p>🎮 <strong>GET READY TO CODE WITH STYLE!</strong> 🎮</p>
+                <p>I'm absolutely <span class="highlight">STOKED</span> to invite you to an epic evening of collaborative coding where we'll dive deep into the world of AI-powered development!</p>
+                <p>We're building <span class="highlight">SNAKE BOTS</span> that will compete head-to-head in an ultimate digital arena! Choose your weapon - any programming language you want - but here's the twist: we're leveraging the <span class="highlight">POWER OF LLMs</span> to supercharge our coding productivity!</p>
+                <p>Your bot will battle against a custom <span class="highlight">Rust web backend</span> running on the LAN. May the best algorithm win! 🏆</p>
+            </div>
+
+            <div class="event-details">
+                <h3>📅 EVENT DETAILS</h3>
+                <p><strong>📍 Location:</strong> Andreas Bjørns Gade 28</p>
+                <p><strong>📅 Date:</strong> Thursday the 13th</p>
+                <p><strong>⏰ Time:</strong> 16:30</p>
+                <p><strong>💻 Bring:</strong> Your laptop & a hungry attitude</p>
+                <p><strong>🍽️ Food:</strong> Dinner will be served during the evening!</p>
+            </div>
+
+            <div class="signature">
+                <p>Yours sincerely,</p>
+                <p><strong>Frederik</strong></p>
+                <p class="ai-note">*This invitation was AI-generated</p>
+            </div>
+        </div>
+
+        <div class="snake-figure">
+            <div class="snake-head"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+            <div class="snake-body"></div>
+        </div>
+    </div>
+</body>
+</html>

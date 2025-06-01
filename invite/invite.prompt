@@ -1,0 +1,7 @@
+Please create a PDF document for me. It is an invitation to my event: "Vibe Coding a Snake Bot". You should write the invitation yourself, but it should incldude that: I am happy to explore vibe coding with my friends, each of us must build a snake bot that can compete and beat the other people's snake bots in a competition, the snake bot can be build in your language of choice as long as we use LLMs and their productive power, and the bot will communicate through a websocket to the backend Rust server running on LAN.
+
+For the event details, it is held at ${LOCATION}, starting at 16:30 on Thursday the 13th. Participants must bring their laptop and a hungry attitude as I will serve dinner during the evning.
+
+I'd like the invitation to be written in a slightly funky, yet legible font. The background of the invitation should be one image that blends the palm trees at Santa Monica beach with non-NSFW GTA vibes and retro snake styling. It should be one A4 page in non-landscape mode and also contain some snake-inspired figure(s). Lastly, it should be signed by yours sincerely, Frederik, but make sure to point out that it is AI generated.
+
+In case you are not able to generate a PDF, then please just generate an image ready to be send in an email.

@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  snake-game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: snake-game-backend
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=3000
+    volumes:
+      # Mount static files for development
+      - ./static:/app/static:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - snake-network
+
+  # Optional: Add a reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    container_name: snake-game-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - snake-game
+    restart: unless-stopped
+    networks:
+      - snake-network
+    profiles:
+      - production
+
+  # Optional: Redis for session management (future enhancement)
+  redis:
+    image: redis:alpine
+    container_name: snake-game-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - snake-network
+    profiles:
+      - production
+
+  # Optional: Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: snake-game-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - snake-network
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana
+    container_name: snake-game-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - snake-network
+    profiles:
+      - monitoring
+
+networks:
+  snake-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

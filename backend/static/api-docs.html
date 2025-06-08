@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Snake Game API Documentation</title>
+
+    <!-- Swagger UI CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
+
+    <!-- Prism.js CSS for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav {
+            background: white;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .nav a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav a:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #4CAF50;
+        }
+
+        .section h3 {
+            color: #34495e;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .section h4 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .endpoint.websocket {
+            border-left-color: #2196F3;
+        }
+
+        .endpoint.http {
+            border-left-color: #4CAF50;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 1rem;
+            color: white;
+        }
+
+        .method.get {
+            background: #4CAF50;
+        }
+
+        .method.ws {
+            background: #2196F3;
+        }
+
+        .path {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .description {
+            margin: 0.5rem 0;
+            color: #555;
+        }
+
+        .code-block {
+            background: #2d3748;
+            border-radius: 8px;
+            padding: 0;
+            margin: 1rem 0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 1.5rem;
+            overflow-x: auto;
+            background: transparent;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-button.copied {
+            background: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+
+        .message-type {
+            background: #e8f5e8;
+            border: 1px solid #4CAF50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .message-type h5 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .message-example {
+            background: #f1f1f1;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .quick-link {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: #2c3e50;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .quick-link h4 {
+            color: #4CAF50;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #45a049;
+        }
+
+        .test-button.secondary {
+            background: #2196F3;
+        }
+
+        .test-button.secondary:hover {
+            background: #1976D2;
+        }
+
+        .connection-status {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .connected { background: #4CAF50; }
+        .disconnected { background: #f44336; }
+        .connecting { background: #ff9800; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .toc {
+            background: #e8f5e8;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Swagger UI Customization */
+        #swagger-ui {
+            margin-top: 1rem;
+        }
+
+        .swagger-ui .topbar {
+            display: none;
+        }
+
+        .swagger-ui .scheme-container {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* Enhanced Code Block Styling */
+
+        /* Prism.js theme overrides */
+        pre[class*="language-"] {
+            background: #2d3748 !important;
+            color: #e2e8f0 !important;
+        }
+
+        .token.comment,
+        .token.prolog,
+        .token.doctype,
+        .token.cdata {
+            color: #718096 !important;
+        }
+
+        .token.punctuation {
+            color: #e2e8f0 !important;
+        }
+
+        .token.property,
+        .token.tag,
+        .token.boolean,
+        .token.number,
+        .token.constant,
+        .token.symbol,
+        .token.deleted {
+            color: #f56565 !important;
+        }
+
+        .token.selector,
+        .token.attr-name,
+        .token.string,
+        .token.char,
+        .token.builtin,
+        .token.inserted {
+            color: #68d391 !important;
+        }
+
+        .token.operator,
+        .token.entity,
+        .token.url,
+        .language-css .token.string,
+        .style .token.string {
+            color: #4fd1c7 !important;
+        }
+
+        .token.atrule,
+        .token.attr-value,
+        .token.keyword {
+            color: #9f7aea !important;
+        }
+
+        .token.function,
+        .token.class-name {
+            color: #fbb6ce !important;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block code {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐍 Snake Game API</h1>
+        <p>Real-time multiplayer snake game WebSocket API for building game clients in any programming language</p>
+    </div>
+
+    <nav class="nav">
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#quick-start">Quick Start</a></li>
+            <li><a href="#swagger-ui">API Spec</a></li>
+            <li><a href="#endpoints">Endpoints</a></li>
+            <li><a href="#messages">Messages</a></li>
+            <li><a href="#examples">Examples</a></li>
+            <li><a href="#testing">Live Testing</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">🎮 Game Overview</a></li>
+                <li><a href="#quick-start">🚀 Quick Start Guide</a></li>
+                <li><a href="#swagger-ui">📋 Interactive API Specification</a></li>
+                <li><a href="#endpoints">🌐 API Endpoints</a></li>
+                <li><a href="#messages">💬 Message Protocol</a></li>
+                <li><a href="#examples">💻 Code Examples</a></li>
+                <li><a href="#testing">🧪 Live Testing</a></li>
+                <li><a href="#deployment">🚀 Local Development Guide</a></li>
+            </ul>
+        </div>
+
+        <section id="overview" class="section">
+            <h2>🎮 Game Overview</h2>
+            <p>Welcome to the Multiplayer Snake Game API! This is a real-time, WebSocket-based API that enables developers to create clients for a competitive snake game.</p>
+
+            <h3>Game Rules</h3>
+            <ul>
+                <li><strong>Grid:</strong> 50x50 cells with wraparound borders</li>
+                <li><strong>Players:</strong> 2-8 players per game</li>
+                <li><strong>Objective</strong>:</strong> Be the last snake alive OR reach length 300</li>
+                <li><strong>Tick Rate:</strong> 200ms (5 FPS) for smooth gameplay</li>
+                <li><strong>Fruits:</strong> Number of players - 1 fruits on board</li>
+                <li><strong>Movement:</strong> Up, Down, Left, Right (cannot reverse into tail)</li>
+            </ul>
+
+            <h3>Key Features</h3>
+            <ul>
+                <li>🔄 Real-time multiplayer gameplay</li>
+                <li>🌐 WebSocket-based communication</li>
+                <li>📊 JSON message protocol</li>
+                <li>🎯 Language-agnostic client development</li>
+                <li>📈 Live game statistics</li>
+                <li>🔍 Interactive API documentation</li>
+            </ul>
+        </section>
+
+        <section id="quick-start" class="section">
+            <h2>🚀 Quick Start Guide</h2>
+
+            <div class="quick-links">
+                <a href="/api-spec.json" class="quick-link" target="_blank">
+                    <h4>📋 OpenAPI Spec</h4>
+                    <p>Download the complete OpenAPI specification in JSON format</p>
+                </a>
+
+                <a href="/" class="quick-link" target="_blank">
+                    <h4>🎮 Play Game</h4>
+                    <p>Access the main game interface to play the snake game</p>
+                </a>
+            </div>
+
+            <h3>🏃‍♂️ 30-Second Setup</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-javascript">// 1. Connect to the WebSocket
+const ws = new WebSocket('ws://localhost:3000/lobby?player_name=MyBot');
+
+// 2. Handle incoming messages
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+
+    if (message.type === 'MoveRequest') {
+        // 3. Send your move
+        ws.send(JSON.stringify({
+            type: 'SubmitMove',
+            direction: 'Up' // or 'Down', 'Left', 'Right'
+        }));
+    }
+};
+
+// 4. Join the lobby when connected
+ws.onopen = () => {
+    ws.send(JSON.stringify({
+        type: 'JoinLobby',
+        player_name: 'MyBot'
+    }));
+};</code></pre>
+            </div>
+        </section>
+
+        <section id="swagger-ui" class="section">
+            <h2>📋 Interactive API Specification</h2>
+            <p>Explore the complete API specification with interactive documentation powered by Swagger UI.</p>
+            <div id="swagger-ui"></div>
+        </section>
+
+        <section id="endpoints" class="section">
+            <h2>🌐 API Endpoints</h2>
+
+            <h3>WebSocket Endpoints</h3>
+
+            <div class="endpoint websocket">
+                <span class="method ws">WS</span>
+                <span class="path">/lobby</span>
+                <div class="description">
+                    <strong>Player Connection Endpoint</strong><br>
+                    Connect as a player to join the game lobby and participate in real-time gameplay.
+                </div>
+                <p><strong>URL:</strong> <code>ws://localhost:3000/lobby?player_name={name}</code></p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>player_name</code></ul> (optional): Your display name in the game</li>
+                </ul>
+                <p><strong>Purpose:</strong> Real-time game participation and move submission</p>
+            </div>
+
+            <div class="endpoint websocket">
+                <span class="method ws">WS</span>
+                <span class="path">/gui</span>
+                <div class="description">
+                    <strong>Spectator/Control Interface</strong><br>
+                    Connect as a spectator to view game state and control lobby functions.
+                </div>
+                <p><strong>URL:</strong> <code>ws://localhost:3000/gui</code></p>
+                <p><strong>Purpose:</strong> Game observation, lobby management, and start control</p>
+            </div>
+
+            <h3>HTTP Endpoints</h3>
+
+            <div class="endpoint http">
+                <span class="method get">GET</span>
+                <span class="path">/health</span>
+                <div class="description">Health check endpoint to verify server status</div>
+                <p><strong>Response:</strong> <code>"OK"</code></p>
+            </div>
+
+            <div class="endpoint http">
+                <span class="method get">GET</span>
+                <span class="path">/stats</span>
+                <div class="description">Current game statistics and metrics</div>
+                <p><strong>Response:</strong> JSON object with game statistics</p>
+                <div class="message-example">
+{
+  "tick": 0,
+  "alive_snakes": 0,
+  "total_snakes": 0,
+  "fruits_on_board": 0,
+  "longest_snake_length": 0,
+  "is_running": false,
+  "winner_id": null
+}
+                </div>
+            </div>
+
+            <div class="endpoint http">
+                <span class="method get">GET</span>
+                <span class="path">/api-spec.json</span>
+                <div class="description">OpenAPI specification in JSON format</div>
+                <p><strong>Response:</strong> Complete OpenAPI 3.0.3 specification</p>
+            </div>
+
+            <div class="endpoint http">
+                <span class="method get">GET</span>
+                <span class="path">/docs</span>
+                <div class="description">Interactive API documentation (this page)</div>
+                <p><strong>Response:</strong> HTML documentation with live testing</p>
+            </div>
+        </section>
+
+        <section id="messages" class="section">
+            <h2>💬 Message Protocol</h2>
+            <p>All WebSocket communication uses JSON messages with a <code>type</code> field for message identification.</p>
+
+            <h3>Client → Server Messages</h3>
+
+            <div class="message-type">
+                <h5>JoinLobby</h5>
+                <p>Join the game lobby with your player name</p>
+                <div class="message-example">
+{
+  "type": "JoinLobby",
+  "player_name": "YourPlayerName"
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>SubmitMove</h5>
+                <p>Submit your next move direction for the current game tick</p>
+                <div class="message-example">
+{
+  "type": "SubmitMove",
+  "direction": "Up"
+}
+                </div>
+                <p><strong>Valid directions:</strong> "Up", "Down", "Left", "Right"</p>
+            </div>
+
+            <div class="message-type">
+                <h5>StartGame</h5>
+                <p>Start the game (GUI connection only, requires minimum 2 players)</p>
+                <div class="message-example">
+{
+  "type": "StartGame"
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>Ping</h5></h5>
+                <p>Keep the connection alive and test connectivity</p>
+                <div class="message-example">
+{
+  "type": "Ping"
+}
+                </div>
+            </div>
+
+            <h3>Server → Client Messages</h3>
+
+            <div class="message-type">
+                <h5>LobbyJoined</h5>
+                <p>Confirmation that you've successfully joined the lobby</p>
+                <div class="message-example">
+{
+  "type": "LobbyJoined",
+  "player_id": "uuid-string",
+  "player_name": "YourPlayerName"
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>LobbyState</h5>
+                <p>Current lobby state with all connected players</p>
+                <div class="message-example">
+{
+  "type": "LobbyState",
+  "players": [
+    {
+      "id": "uuid-string",
+      "name": "Player1",
+      "color_index": 0,
+      "is_ready": true
+    }
+  ]
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>GameStarted</h5>
+                <p>Game has started with initial game state</p>
+                <div class="message-example">
+{
+  "type": "GameStarted",
+  "game_state": { /* GameState object */ },
+  "your_snake_id": "uuid-string"
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>GameUpdate</h5>
+                <p>Regular game state updates every tick (200ms)</p>
+                <div class="message-example">
+{
+  "type": "GameUpdate",
+  "game_state": { /* Updated GameState object */ }
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>MoveRequest</h5>
+                <p>Server requests your next move with valid directions</p>
+                <div class="message-example">
+{
+  "type": "MoveRequest",
+  "valid_directions": ["Up", "Down", "Left", "Right"],
+  "time_limit_ms": 5000
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>GameEnded</h5>
+                <p>Game has ended with final results</p>
+                <div class="message-example">
+{
+  "type": "GameEnded",
+  "winner": { /* LobbyPlayer object or null */ },
+  "final_state": { /* Final GameState */ }
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>Error</h5>
+                <p>Error message from the server</p>
+                <div class="message-example">
+{
+  "type": "Error",
+  "message": "Error description"
+}
+                </div>
+            </div>
+
+            <div class="message-type">
+                <h5>Pong</h5>
+                <p>Response to Ping message</p>
+                <div class="message-example">
+{
+  "type": "Pong"
+}
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="section">
+            <h2>💻 Code Examples</h2>
+
+            <h3>JavaScript/Node.js Client</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-javascript">const WebSocket = require('ws');
+
+class SnakeGameClient {
+    constructor(playerName) {
+        this.playerName = playerName;
+        this.ws = null;
+    }
+
+    connect() {
+        const url = `ws://localhost:3000/lobby?player_name=${this.playerName}`;
+        this.ws = new WebSocket(url);
+
+        this.ws.onopen = () => {
+            console.log('Connected to game server');
+            this.joinLobby();
+        };
+
+        this.ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            this.handleMessage(message);
+        };
+
+        this.ws.onclose = () => {
+            console.log('Disconnected from server');
+        };
+    }
+
+    joinLobby() {
+        this.sendMessage({
+            type: 'JoinLobby',
+            player_name: this.playerName
+        });
+    }
+
+    handleMessage(message) {
+        switch (message.type) {
+            case 'LobbyJoined':
+                console.log(`Joined lobby with ID: ${message.player_id}`);
+                break;
+
+            case 'MoveRequest':
+                // Simple AI: move randomly
+                const directions = message.valid_directions;
+                const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+                this.submitMove(randomDirection);
+                break;
+
+            case 'GameUpdate':
+                console.log(`Game tick: ${message.game_state.tick}`);
+                break;
+
+            case 'GameEnded':
+                console.log('Game ended!', message.winner);
+                break;
+        }
+    }
+
+    submitMove(direction) {
+        this.sendMessage({
+            type: 'SubmitMove',
+            direction: direction
+        });
+    }
+
+    sendMessage(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
+        }
+    }
+}
+
+// Usage
+const client = new SnakeGameClient('MyBot');
+client.connect();</code></pre>
+            </div>
+
+            <h3>Python Client</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-python">import asyncio
+import websockets
+import json
+import random
+
+class SnakeGameClient:
+    def __init__(self, player_name):
+        self.player_name = player_name
+        self.player_id = None
+
+    async def connect(self):
+        uri = f"ws://localhost:3000/lobby?player_name={self.player_name}"
+
+        async with websockets.connect(uri) as websocket:
+            # Join lobby
+            await self.send_message(websocket, {
+                "type": "JoinLobby",
+                "player_name": self.player_name
+            })
+
+            # Main game loop
+            async for message in websocket:
+                data = json.loads(message)
+                await self.handle_message(websocket, data)
+
+    async def handle_message(self, websocket, message):
+        msg_type = message['type']
+
+        if msg_type == 'LobbyJoined':
+            self.player_id = message['player_id']
+            print(f"Joined lobby with ID: {self.player_id}")
+
+        elif msg_type == 'MoveRequest':
+            # Simple AI: choose random valid direction
+            valid_directions = message['valid_directions']
+            direction = random.choice(valid_directions)
+
+            await self.send_message(websocket, {
+                "type": "SubmitMove",
+                "direction": direction
+            })
+
+        elif msg_type == 'GameUpdate':
+            game_state = message['game_state']
+            print(f"Game tick: {game_state['tick']}")
+
+        elif msg_type == 'GameEnded':
+            winner = message.get('winner')
+            if winner:
+                print(f"Game ended! Winner: {winner['name']}")
+            else:
+                print("Game ended in a draw!")
+            break
+
+    async def send_message(self, websocket, message):
+        await websocket.send(json.dumps(message))
+
+# Usage
+async def main():
+    client = SnakeGameClient("PythonBot")
+    await client.connect()
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            </div>
+
+            <h3>Browser JavaScript</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-javascript">class BrowserSnakeClient {
+    constructor(playerName) {
+        this.playerName = playerName;
+        this.ws = null;
+    }
+
+    connect() {
+        const wsUrl = `ws://${window.location.host}/lobby?player_name=${this.playerName}`;
+        this.ws = new WebSocket(wsUrl);
+
+        this.ws.onopen = () => {
+            console.log('Connected to game');
+            this.joinLobby();
+        };
+
+        this.ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            this.handleMessage(message);
+        };
+
+        // Add keyboard controls
+        document.addEventListener('keydown', (event) => {
+            this.handleKeyPress(event);
+        });
+    }
+
+    handleKeyPress(event) {
+        const keyMap = {
+            'ArrowUp': 'Up',
+            'ArrowDown': 'Down',
+            'ArrowLeft': 'Left',
+            'ArrowRight': 'Right',
+            'w': 'Up',
+            's': 'Down',
+            'a': 'Left',
+            'd': 'Right'
+        };
+
+        const direction = keyMap[event.key];
+        if (direction) {
+            this.submitMove(direction);
+            event.preventDefault();
+        }
+    }
+
+    joinLobby() {
+        this.sendMessage({
+            type: 'JoinLobby',
+            player_name: this.playerName
+        });
+    }
+
+    handleMessage(message) {
+        switch (message.type) {
+            case 'LobbyJoined':
+                this.updateStatus(`Joined as ${message.player_name}`);
+                break;
+
+            case 'GameUpdate':
+                this.renderGame(message.game_state);
+                break;
+
+            case 'MoveRequest':
+                this.updateStatus('Your turn! Use arrow keys or WASD');
+                break;
+        }
+    }
+
+    submitMove(direction) {
+        this.sendMessage({
+            type: 'SubmitMove',
+            direction: direction
+        });
+    }
+
+    sendMessage(message) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
+        }
+    }
+
+    updateStatus(message) {
+        const statusEl = document.getElementById('status');
+        if (statusEl) {
+            statusEl.textContent = message;
+        }
+    }
+
+    renderGame(gameState) {
+        // Implement your game rendering logic here
+        console.log('Game state:', gameState);
+    }
+}
+
+// Usage
+const client = new BrowserSnakeClient('WebPlayer');
+client.connect();</code></pre>
+            </div>
+        </section>
+
+        <section id="testing" class="section">
+            <h2>🧪 Live Testing</h2>
+            <p>Test the WebSocket connections and API functionality directly from this page.</p>
+
+            <h3>Connection Status</h3>
+            <div>
+                <span class="status-indicator disconnected" id="player-status"></span>
+                Player Connection: <span id="player-status-text">Disconnected</span>
+            </div>
+            <div>
+                <span class="status-indicator disconnected" id="gui-status"></span>
+                GUI Connection: <span id="gui-status-text">Disconnected</span>
+            </div>
+
+            <h3>Test Controls</h3>
+            <button class="test-button" onclick="testPlayerConnection()">Test Player Connection</button>
+            <button class="test-button secondary" onclick="testGUIConnection()">Test GUI Connection</button>
+            <button class="test-button" onclick="clearTestOutput()">Clear Output</button>
+
+            <div class="connection-status" id="test-output">
+                Ready to test connections... Click a button above to begin.
+            </div>
+
+            <h3>Quick Tests</h3>
+            <button class="test-button" onclick="testHealthEndpoint()">Test Health Endpoint</button>
+            <button class="test-button" onclick="testStatsEndpoint()">Test Stats Endpoint</button>
+        </section>
+
+        <section id="deployment" class="section">
+            <h2>🚀 Local Development Guide</h2>
+            
+            <h3>Prerequisites</h3>
+            <ul>
+                <li><strong>Rust:</strong> Install from <a href="https://rustup.rs/" target="_blank">rustup.rs</a> (requires Rust 1.70+)</li>
+                <li><strong>Git:</strong> For cloning the repository</li>
+                <li><strong>Web Browser:</strong> Modern browser with WebSocket support</li>
+            </ul>
+
+            <h3>Quick Start</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-bash"># Clone the repository
+git clone <repository-url>
+cd snake-game-server
+
+# Build and run the server
+cargo run --release
+
+# Server will start on http://localhost:3000</code></pre>
+            </div>
+
+            <h3>Development Commands</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-bash"># Run in development mode with hot reload
+cargo watch -x run
+
+# Run tests
+cargo test
+
+# Run with debug logging
+RUST_LOG=debug cargo run
+
+# Build for production
+cargo build --release</code></pre>
+            </div>
+
+            <h3>Environment Variables</h3>
+            <ul>
+                <li><code>RUST_LOG</code>: Set logging level (debug, info, warn, error)</li>
+                <li><code>SERVER_PORT</code>: Override default port (default: 3000)</li>
+                <li><code>MAX_PLAYERS</code>: Override maximum players per game (default: 8)</li>
+                <li><code>CORS_ORIGIN</code>: Set allowed CORS origins (default: any)</li>
+            </ul>
+
+            <h3>Project Structure</h3>
+            <div class="code-block">
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                <pre><code class="language-text">src/
+├── main.rs              # Server entry point
+├── game/               # Game logic
+│   ├── mod.rs
+│   ├── snake.rs        # Snake entity logic
+│   ├── food.rs         # Food generation
+│   └── state.rs        # Game state management
+├── websocket/          # WebSocket handlers
+│   ├── mod.rs
+│   ├── lobby.rs        # Lobby management
+│   └── messages.rs     # Message types
+└── web/               # HTTP handlers
+    ├── mod.rs
+    └── routes.rs      # API routes
+
+static/                # Static web files
+├── index.html         # Game interface
+├── api-docs.html      # API documentation
+└── assets/           # CSS, JS, images</code></pre>
+            </div>
+
+            <h3>Testing Your Setup</h3>
+            <ol>
+                <li><strong>Start the server:</strong> Run <code>cargo run</code></li>
+                <li><strong>Open browser:</strong> Navigate to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                <li><strong>Test API:</strong> Visit <a href="http://localhost:3000/health" target="_blank">http://localhost:3000/health</a></li>
+                <li><strong>WebSocket test:</strong> Use the Live Testing section below</li>
+            </ol>
+
+            <h3>Troubleshooting</h3>
+            <ul>
+                <li><strong>Port in use:</strong> Set <code>SERVER_PORT=3001</code> to use a different port</li>
+                <li><strong>Build errors:</strong> Ensure you have Rust 1.70+ with <code>rustc --version</code></li>
+                <li><strong>WebSocket connection fails:</strong> Check firewall settings and CORS configuration</li>
+                <li><strong>Performance issues:</strong> Use <code>cargo run --release</code> for optimized builds</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Swagger UI JavaScript -->
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+
+    <!-- Prism.js JavaScript for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+    <script>
+        // Initialize Swagger UI
+        const ui = SwaggerUIBundle({
+            url: '/api-spec.json',
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+        });
+
+        // Copy to clipboard functionality
+        function copyToClipboard(button) {
+            const codeBlock = button.nextElementSibling.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                button.textContent = 'Failed';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        let testWs = null;
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('test-output');
+            const timestamp = new Date().toISOString().substr(11, 12);
+            const line = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            output.textContent += line;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateStatus(connectionType, status) {
+            const indicator = document.getElementById(`${connectionType}-status`);
+            const text = document.getElementById(`${connectionType}-status-text`);
+
+            indicator.className = `status-indicator ${status}`;
+            text.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function testPlayerConnection() {
+            log('Testing player WebSocket connection...');
+            updateStatus('player', 'connecting');
+
+            const ws = new WebSocket('ws://localhost:3000/lobby?player_name=TestPlayer');
+
+            ws.onopen = () => {
+                log('Player WebSocket connected successfully!', 'success');
+                updateStatus('player', 'connected');
+
+                // Send join lobby message
+                ws.send(JSON.stringify({
+                    type: 'JoinLobby',
+                    player_name: 'TestPlayer'
+                }));
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                log(`Received message: ${message.type}`, 'info');
+
+                if (message.type === 'LobbyJoined') {
+                    log(`Successfully joined lobby with ID: ${message.player_id}`, 'success');
+                    // Close connection after successful test
+                    setTimeout(() => ws.close(), 2000);
+                }
+            };
+
+            ws.onclose = () => {
+                log('Player connection closed', 'info');
+                updateStatus('player', 'disconnected');
+            };
+
+            ws.onerror = (error) => {
+                log(`Player connection error: ${error}`, 'error');
+                updateStatus('player', 'disconnected');
+            };
+        }
+
+        function testGUIConnection() {
+            log('Testing GUI WebSocket connection...');
+            updateStatus('gui', 'connecting');
+
+            const ws = new WebSocket('ws://localhost:3000/gui');
+
+            ws.onopen = () => {
+                log('GUI WebSocket connected successfully!', 'success');
+                updateStatus('gui', 'connected');
+
+                // Close connection after successful test
+                setTimeout(() => ws.close(), 2000);
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                log(`GUI received: ${message.type}`, 'info');
+            };
+
+            ws.onclose = () => {
+                log('GUI connection closed', 'info');
+                updateStatus('gui', 'disconnected');
+            };
+
+            ws.onerror = (error) => {
+                log(`GUI connection error: ${error}`, 'error');
+                updateStatus('gui', 'disconnected');
+            };
+        }
+
+        function clearTestOutput() {
+            document.getElementById('test-output').textContent = 'Output cleared. Ready for new tests...\n';
+        }
+
+        function testHealthEndpoint() {
+            log('Testing health endpoint...');
+
+            fetch('/health')
+                .then(response => response.text())
+                .then(data => {
+                    log(`Health endpoint response: ${data}`, 'success');
+                })
+                .catch(error => {
+                    log(`Health endpoint error: ${error}`, 'error');
+                });
+        }
+
+        function testStatsEndpoint() {
+            log('Testing stats endpoint...');
+
+            fetch('/stats')
+                .then(response => response.json())
+                .then(data => {
+                    log(`Stats: ${JSON.stringify(data, null, 2)}`, 'success');
+                })
+                .catch(error => {
+                    log(`Stats endpoint error: ${error}`, 'error');
+                });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            log('API documentation loaded. Ready for testing!', 'success');
+        });
+    </script>
+</body>
+</html>

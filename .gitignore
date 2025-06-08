@@ -1,0 +1,106 @@
+# Rust/Cargo generated files
+target/
+Cargo.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Docker
+.dockerignore
+
+# Node.js (if any frontend tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Rust-specific
+**/*.rs.bk
+*.pdb
+
+# WebAssembly
+*.wasm
+pkg/
+wasm-pack.log
+
+# Local development
+.local/
+.vagrant/
+
+# Coverage reports
+tarpaulin-report.html
+coverage/
+lcov.info
+
+# Flamegraph profiling
+flamegraph.svg
+perf.data*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Testing
+test-results/
+.nyc_output/
+
+# IDE specific
+*.sublime-project
+*.sublime-workspace
+.vimrc.local
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+*.exe
+*.msi
+
+# Linux
+*.AppImage
+*.deb
+*.rpm
+
+# Rust documentation
+/doc/
+
+# Local configuration
+config.local.*

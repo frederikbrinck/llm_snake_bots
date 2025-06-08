@@ -1,0 +1,155 @@
+//! This prompt details how I communicated with Claude to build the backend.
+
+# Overview
+
+I am building an interactive multiplayer game and I would like you to code
+the backend for me in Rust. Below I will outline the game for you followed by
+specific implementation details I'd like you to follow closely. In case you
+have doubts don't hesitate to ask for more information.
+
+# The Game
+
+## Setup
+
+The game is a multiplayer interactive snake game. It consists of a 2D grid with
+50 vertical and 50 horizontal cells. Each player controls a snake which is made
+up of a length and a queue of x, y positions. The queue of x, y positions has
+the same length as the length of the snake. A snake also has a head and a tail.
+The head corresponds to the front of the queue while the tail corresponds to all
+other entries in the queueu. At the beginning of the game, all snakes starts at a
+lenght of 1 in some random cell. No two snakes can be in the same cell.
+
+## Gameplay
+
+For each game tick, each player is asked to move their snake 1 cell in any one
+direction. The possible directions are UP, DOWN, LEFT, and RIGHT. Once all players have
+decided which direction they want to move in all snakes move 1 cell in that direction
+and the game state updates in the following way:
+
+* In case two snakes' heads are in the same cell both snakes die.
+
+* In case one snake's head is in the same cell as another snake's tail, the snake whose head
+  is concerned, dies.
+
+* In case one snake's head is in the same cell as part of its tail, that snake dies.
+
+* In case the snakes head is in the same cell as a piece of fruit, that snake grows 1 in
+  lenght.
+
+Once a snake is dead it remains on the grid and other snakes still die when colliding with it.
+
+In case a snake that is longer than 1 length moves, the head moves to the new cell, and the
+cell which contains the end of the snake's tail, will be emptied and available again for other
+snakes so that they can occupy it. This simulates a "moving snake" in 2 dimensions.
+
+In case a snake collides with the edge of the grid, the snake continues moving through to the
+opposite side of the grid. In that sense, the grid has no boundaries. For instance, if the
+snake moves UP from cell x=10, y=0 then its head will be placed in cell x=10, y=49.
+
+If a snake has a tail, it can never move back onto its own tail, and as such it only has 3
+directions to move in. For instance, if a snake of length 3 with its head on x=7, y=19,
+and the tail at [{ x=8, y=19 }, { x=8, y=20 }], then the snake cannot move RIGHT because that
+would imply that the snake moved its head from x=7, y=19 to x=8, y=19 which is a cell that
+contains the snake's tail already.
+
+The game ends when either:
+
+* One snake is alive and all other snakes are dead. In that case, the snake that is alive wins.
+
+* One snake becomes reaches a lenght of 300. In that case, the snake of lenght 300 wins.
+
+## Fruit
+
+If there are X players playing, there are at most X-1 pieces of fruit available on the board.
+Each fruit spawns after 5 game ticks. They always spawn in a random, empty cell. Once a fruit
+has been "eaten" - that is, a snake's head is in the same cell as that piece of fruit - then
+the fruit will disappear, and a new fruit will spawn again in another random, empty cell with
+a delay factor of 5 ticks such that we always have X-1 pieces of fruit on the board.
+
+# Implementation
+
+Implement the backend for the above game in Rust. The backend should consists of the following
+elements:
+
+* An axum web-server that exposes a websocket through which players can connect and play over LAN.
+
+* Clearly defined API types and documentation
+
+* A graphical user interface that shows the entire game and controls the initialization flow.
+
+I will now break down each element in more detail.
+
+## Axum Web server
+
+The axum web server has the following endpoints:
+
+* `<webserver ip>/lobby` which is the websocket endpoint that allows clients to connect to the server
+  and play
+
+* `<webserver ip>/gui` which is the endpoint to see the GUI.
+
+## The Game API
+
+The game API must be defined by an OpenAPI swagger specification, and the code for the API structs must
+be comprehensive enough so that a programmer quickly can implement a new player client in their language
+of choice using LLM assisted programming tools simply by pointing the LLM to the API. The structs must
+be serializable and deserializable with serde, and the communication protocol between the player clients
+and the server is JSON.
+
+The flow of the API is quite simple and is outlined below:
+
+1. A new player client connects to the lobby. They must provide their player name in the connection request.
+
+2. Once all players have connected, the backend receives a signal from the GUI that the game starts
+
+3. Each player receives their own snake's coordinates and length, all other snake's coordinates and
+   lenghts and whether they are dead or alive, and the position of all pieces of fruit.
+
+4. Each player communicates to the server which direction they want to move in.
+
+5. Once the server has received the next move from all the snakes, the server updates all snakes positions and
+   their states according to the game play rules.
+
+6. We repeat step 3-6 until a) the player dies, in which case they won't have to submit any more moves, or 2) one snake
+   wins by either being the last one alive, or the having a length of 300. Each of these ticks should have a delay of
+   200ms between them, so we can see them update in the GUI.
+
+## The Graphical User Interface
+
+The graphical user interface should be a WASM application that has two states:
+
+* Before Game Start: Before game start it displays the lobby with a list of the connected players, their names
+  and a "start" button.
+
+* Running Game: Once the start button is hit, the game starts, and the GUI displays a 50 by 50 grid with all
+  the snakes moving with each game tick and with fruit appearing as we go. Each snake must have its own color,
+  and the name of the player with the snake, its associated color and length must be displayed as well. In case
+  a snake is dead, it must get a lighter, more  grayed out shade of the same color, and the name must be struck
+  through to indicate its dead.
+
+This sums up the game and its suggested implementation details. Lastly, I'd like you to create a constants file
+that contain all the constants mentioned above so that they can easily be changed. As an example, the grid size
+must be a constant, and the snake's length to win the game must also be a constant.
+
+In case anything is unclear, please ask for further clarifications.
+
+//! Details about the prompt progress:
+//!
+//! * Took me 1h and 10 minutes to write out details and take decisions.
+//!
+//! * Took Claude Sonnet 4 30-40 minutes to create the general setup.
+//!   There were few corrections along the way, as well as the fact that I had
+//!   to enable permissions.
+//!
+//! * When done, the GUI did not compile, so had to ask Claude to fix it. Then
+//!   I reached a maximum token length, so I had do a new agent thread.
+//!
+//! * Took me 40 minutes to briefly review the backend code and game implementation
+//!   diving into details here and there. Mostly it was a glance.
+//!
+//! * Swagger API did not dipslay on the web, so had to ask Claude to fix it along
+//!   with a lot of other small issues with it. Took me 1h to iterate over it to get
+//!   it to a good state.
+//!
+//! * Claude did not share the types between backend and GUI, they were copied.
+//!   It would have been better to have a shared crate.

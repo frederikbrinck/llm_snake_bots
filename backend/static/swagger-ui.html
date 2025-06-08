@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Snake Game API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            background: #fafafa;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .swagger-ui .topbar {
+            background-color: #1a1a1a;
+            padding: 20px;
+        }
+
+        .swagger-ui .topbar .topbar-wrapper {
+            max-width: none;
+        }
+
+        .swagger-ui .topbar .topbar-wrapper .link {
+            color: #4CAF50;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .swagger-ui .topbar .topbar-wrapper .link:before {
+            content: "🐍 ";
+        }
+
+        .swagger-ui .info {
+            margin: 50px 0;
+        }
+
+        .swagger-ui .info .title {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .swagger-ui .info .description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #34495e;
+        }
+
+        .custom-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .custom-header h1 {
+            color: #4CAF50;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .custom-header p {
+            font-size: 1.3em;
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .quick-links {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-links h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .quick-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 8px 16px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .quick-links a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .connection-examples {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .connection-examples h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        .connection-examples pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+
+        .endpoint-info {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .endpoint-info h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .endpoint-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .endpoint-item .method {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .endpoint-item .path {
+            font-family: monospace;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .endpoint-item .description {
+            margin-top: 8px;
+            color: #7f8c8d;
+        }
+
+        #swagger-ui {
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .custom-header h1 {
+                font-size: 2em;
+            }
+            
+            .custom-header p {
+                font-size: 1.1em;
+            }
+            
+            .quick-links a {
+                display: block;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-header">
+        <h1>🐍 Snake Game API</h1>
+        <p>Real-time multiplayer snake game WebSocket API documentation</p>
+    </div>
+
+    <div class="quick-links">
+        <h3>🔗 Quick Links</h3>
+        <a href="#swagger-ui">API Documentation</a>
+        <a href="/api-spec.json" target="_blank">OpenAPI JSON</a>
+        <a href="/health" target="_blank">Health Check</a>
+        <a href="/stats" target="_blank">Game Stats</a>
+        <a href="/" target="_blank">Game Interface</a>
+        <a href="/static/integration-test.html" target="_blank">Integration Test</a>
+    </div>
+
+    <div class="endpoint-info">
+        <h3>🌐 WebSocket Endpoints</h3>
+        
+        <div class="endpoint-item">
+            <span class="method">WS</span>
+            <span class="path">/lobby?player_name={name}</span>
+            <div class="description">
+                Connect as a player to join the game lobby and participate in matches.
+                Supports real-time game communication and move submission.
+            </div>
+        </div>
+        
+        <div class="endpoint-item">
+            <span class="method">WS</span>
+            <span class="path">/gui</span>
+            <div class="description">
+                Connect as a spectator/controller to view the game state and manage lobby.
+                Provides read-only access to game events and state updates.
+            </div>
+        </div>
+    </div>
+
+    <div class="connection-examples">
+        <h3>💡 Quick Start Examples</h3>
+        
+        <h4>JavaScript Player Client</h4>
+        <pre><code>// Connect to the game
+const ws = new WebSocket('ws://localhost:3000/lobby?player_name=MyPlayer');
+
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    
+    if (message.type === 'MoveRequest') {
+        // Submit your move
+        ws.send(JSON.stringify({
+            type: 'SubmitMove',
+            direction: 'Up' // or 'Down', 'Left', 'Right'
+        }));
+    }
+};
+
+// Join the lobby
+ws.onopen = () => {
+    ws.send(JSON.stringify({
+        type: 'JoinLobby',
+        player_name: 'MyPlayer'
+    }));
+};</code></pre>
+
+        <h4>Python Client Example</h4>
+        <pre><code>import asyncio
+import websockets
+import json
+
+async def snake_client():
+    uri = "ws://localhost:3000/lobby?player_name=PythonBot"
+    
+    async with websockets.connect(uri) as websocket:
+        # Join lobby
+        await websocket.send(json.dumps({
+            "type": "JoinLobby",
+            "player_name": "PythonBot"
+        }))
+        
+        # Game loop
+        async for message in websocket:
+            data = json.loads(message)
+            
+            if data['type'] == 'MoveRequest':
+                # AI logic here - for demo, just move up
+                await websocket.send(json.dumps({
+                    "type": "SubmitMove", 
+                    "direction": "Up"
+                }))
+
+asyncio.run(snake_client())</code></pre>
+
+        <h4>Testing with curl</h4>
+        <pre><code># Test WebSocket connection
+curl -i -N \
+  -H "Connection: Upgrade" \
+  -H "Upgrade: websocket" \
+  -H "Sec-WebSocket-Version: 13" \
+  -H "Sec-WebSocket-Key: test" \
+  "http://localhost:3000/lobby?player_name=TestPlayer"</code></pre>
+    </div>
+
+    <div class="endpoint-info">
+        <h3>📊 HTTP Endpoints</h3>
+        
+        <div class="endpoint-item">
+            <span class="method">GET</span>
+            <span class="path">/health</span>
+            <div class="description">Health check endpoint. Returns "OK" if server is running.</div>
+        </div>
+        
+        <div class="endpoint-item">
+            <span class="method">GET</span>
+            <span class="path">/stats</span>
+            <div class="description">Current game statistics including tick count, alive players, and game state.</div>
+        </div>
+        
+        <div class="endpoint-item">
+            <span class="method">GET</span>
+            <span class="path">/api-spec.json</span>
+            <div class="description">OpenAPI specification in JSON format for programmatic access.</div>
+        </div>
+    </div>
+
+    <div id="swagger-ui" class="loading">
+        Loading API documentation...
+    </div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            try {
+                const ui = SwaggerUIBundle({
+                    url: '/api-spec.json',
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "StandaloneLayout",
+                    tryItOutEnabled: false, // Disable try-it-out for WebSocket APIs
+                    displayRequestDuration: true,
+                    docExpansion: 'list',
+                    filter: true,
+                    showExtensions: true,
+                    showCommonExtensions: true,
+                    defaultModelsExpandDepth: 2,
+                    defaultModelExpandDepth: 2,
+                    displayOperationId: false,
+                    onComplete: function() {
+                        // Add custom styling or behavior after load
+                        console.log('Swagger UI loaded successfully');
+                        
+                        // Add WebSocket connection test buttons
+                        addConnectionTestButtons();
+                    },
+                    onFailure: function(error) {
+                        console.error('Failed to load Swagger UI:', error);
+                        document.getElementById('swagger-ui').innerHTML = 
+                            '<div class="error">❌ Failed to load API documentation. Please check if the server is running and /api-spec.json is accessible.</div>';
+                    }
+                });
+
+                function addConnectionTestButtons() {
+                    // Add test connection functionality
+                    const testSection = document.createElement('div');
+                    testSection.innerHTML = `
+                        <div style="background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                            <h3 style="margin-top: 0; color: #2c3e50;">🧪 Live Connection Testing</h3>
+                            <p>Test WebSocket connections directly from this page:</p>
+                            <button onclick="testPlayerConnection()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer;">
+                                Test Player Connection
+                            </button>
+                            <button onclick="testGUIConnection()" style="background: #2196F3; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer;">
+                                Test GUI Connection
+                            </button>
+                            <button onclick="openIntegrationTest()" style="background: #ff9800; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer;">
+                                Open Integration Test
+                            </button>
+                            <div id="connection-status" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 100px; font-family: monospace; font-size: 14px; overflow-y: auto; max-height: 200px;">
+                                Ready to test connections...
+                            </div>
+                        </div>
+                    `;
+                    
+                    const swaggerContainer = document.getElementById('swagger-ui');
+                    swaggerContainer.parentNode.insertBefore(testSection, swaggerContainer);
+                }
+
+                // Global functions for testing
+                window.testPlayerConnection = function() {
+                    const status = document.getElementById('connection-status');
+                    status.innerHTML += '🔌 Testing player connection...\n';
+                    
+                    const ws = new WebSocket('ws://localhost:3000/lobby?player_name=SwaggerTestPlayer');
+                    
+                    ws.onopen = function() {
+                        status.innerHTML += '✅ Player WebSocket connected successfully!\n';
+                        ws.send(JSON.stringify({
+                            type: 'JoinLobby',
+                            player_name: 'SwaggerTestPlayer'
+                        }));
+                    };
+                    
+                    ws.onmessage = function(event) {
+                        const message = JSON.parse(event.data);
+                        status.innerHTML += `📥 Received: ${message.type}\n`;
+                        
+                        if (message.type === 'LobbyJoined') {
+                            status.innerHTML += `🎮 Successfully joined lobby with ID: ${message.player_id}\n`;
+                            setTimeout(() => ws.close(), 2000);
+                        }
+                    };
+                    
+                    ws.onclose = function() {
+                        status.innerHTML += '🔌 Connection closed\n\n';
+                    };
+                    
+                    ws.onerror = function(error) {
+                        status.innerHTML += `❌ Connection error: ${error}\n\n`;
+                    };
+                    
+                    status.scrollTop = status.scrollHeight;
+                };
+
+                window.testGUIConnection = function() {
+                    const status = document.getElementById('connection-status');
+                    status.innerHTML += '🔌 Testing GUI connection...\n';
+                    
+                    const ws = new WebSocket('ws://localhost:3000/gui');
+                    
+                    ws.onopen = function() {
+                        status.innerHTML += '✅ GUI WebSocket connected successfully!\n';
+                        setTimeout(() => ws.close(), 2000);
+                    };
+                    
+                    ws.onmessage = function(event) {
+                        const message = JSON.parse(event.data);
+                        status.innerHTML += `📥 GUI Received: ${message.type}\n`;
+                    };
+                    
+                    ws.onclose = function() {
+                        status.innerHTML += '🔌 GUI connection closed\n\n';
+                    };
+                    
+                    ws.onerror = function(error) {
+                        status.innerHTML += `❌ GUI connection error: ${error}\n\n`;
+                    };
+                    
+                    status.scrollTop = status.scrollHeight;
+                };
+
+                window.openIntegrationTest = function() {
+                    window.open('/static/integration-test.html', '_blank');
+                };
+
+            } catch (error) {
+                console.error('Error initializing Swagger UI:', error);
+                document.getElementById('swagger-ui').innerHTML = 
+                    '<div class="error">❌ Error initializing API documentation. Please ensure the server is running properly.</div>';
+            }
+        };
+    </script>
+</body>
+</html>

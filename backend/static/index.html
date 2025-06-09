@@ -201,12 +201,19 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.6s ease-out;
         }
 
         #game-canvas {
             border: 3px solid #4CAF50;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+            animation: glow 2s ease-in-out infinite;
+            transition: transform 0.3s ease;
+        }
+
+        #game-canvas:hover {
+            transform: scale(1.02);
         }
 
         .game-info {
@@ -216,6 +223,47 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             min-width: 250px;
             max-width: 300px;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* Lobby styles */
@@ -233,6 +281,27 @@
             list-style: none;
             padding: 0;
             margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .players-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .players-list::-webkit-scrollbar-track {
+            background: #2c2c2c;
+            border-radius: 4px;
+        }
+
+        .players-list::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 4px;
+        }
+
+        .players-list::-webkit-scrollbar-thumb:hover {
+            background: #45a049;
         }
 
         .player-item {
@@ -242,12 +311,25 @@
             margin: 10px 0;
             background-color: #3c3c3c;
             border-radius: 8px;
-            transition: background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+
+            border-left: 4px solid transparent;
+            max-width: 100%;
+            contain: layout;
         }
 
         .player-item:hover {
             background-color: #4c4c4c;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
+
+        .player-item.dead {
+            background-color: #2a2a2a;
+            opacity: 0.6;
+        }
+
+
 
         .player-color {
             width: 24px;
@@ -258,17 +340,116 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .player-name {
+        .player-color.dead {
+            filter: grayscale(100%) brightness(0.5);
+            border-color: #666666;
+        }
+
+        .player-info {
             flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .player-name {
             font-weight: bold;
             text-align: left;
             font-size: 1.1em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .player-name.dead {
+            text-decoration: line-through;
+            color: #888888;
         }
 
         .player-length {
             color: #cccccc;
             font-size: 0.95em;
-            margin-left: 10px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: right;
+            background: #4a4a4a;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .player-length.dead {
+            color: #666666;
+            background: #333333;
+        }
+
+        .player-rank {
+            position: absolute;
+            left: -5px;
+            top: -5px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            font-size: 0.8em;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .player-rank.visible {
+            transform: scale(1);
+        }
+
+        .player-rank.first {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .player-rank.second {
+            background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+        }
+
+        .player-rank.third {
+            background: linear-gradient(45deg, #CD7F32, #B8860B);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: scale(1);
+            }
+            40%, 43% {
+                transform: scale(1.2);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            90% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .start-button {
@@ -413,31 +594,45 @@
 
         // Handle messages from server
         function handleServerMessage(message) {
+            console.log('📥 Received message:', message.type, message);
+            
             switch (message.type) {
                 case 'LobbyState':
+                    console.log('🏠 Updating lobby with', message.players.length, 'players');
                     showLobby(message.players);
                     break;
                     
                 case 'GameStarted':
+                    console.log('🚀 Game started!', message);
                     showGame(message.game_state);
                     gameControls.classList.add('visible');
                     break;
                     
                 case 'GameUpdate':
-                    updateGame(message.game_state);
+                    console.log('⏱️ Game update - tick:', message.game_state.tick);
+                    // If we're not showing the game yet, initialize it first
+                    if (!document.getElementById('game-canvas')) {
+                        console.log('🎮 First game update - initializing game view');
+                        showGame(message.game_state);
+                        gameControls.classList.add('visible');
+                    } else {
+                        updateGame(message.game_state);
+                    }
                     break;
                     
                 case 'GameEnded':
+                    console.log('🏁 Game ended!', message);
                     showGameEnded(message.winner, message.final_state);
                     gameControls.classList.remove('visible');
                     break;
                     
                 case 'Error':
+                    console.error('❌ Server error:', message.message);
                     showError(message.message);
                     break;
                     
                 default:
-                    console.log('Unknown message type:', message.type);
+                    console.warn('❓ Unknown message type:', message.type);
             }
         }
 
@@ -453,6 +648,7 @@
 
         // UI Functions
         function showLobby(players) {
+            console.log('🏠 Showing lobby UI with players:', players);
             const minPlayers = 2;
             const maxPlayers = 8;
             
@@ -461,24 +657,39 @@
                     <h2>🏁 Game Lobby</h2>
                     <p>Players: ${players.length} / ${maxPlayers}</p>
                     
+
+                    
                     <h3>Connected Players</h3>
                     <ul class="players-list">
                         ${players.map(player => `
                             <li class="player-item">
                                 <div class="player-color" style="background-color: ${getPlayerColor(player.color_index)}"></div>
                                 <span class="player-name">${escapeHtml(player.name)}</span>
-                                <span class="player-length">Ready</span>
+                                <span class="player-length">${player.is_ready ? '✅ Ready' : '⏳ Not Ready'}</span>
                             </li>
                         `).join('')}
                     </ul>
+                    
+                    ${players.length === 0 ? 
+                        '<p style="color: #ccc; text-align: center; margin: 20px 0;">No players in lobby. Use bot.py or other clients to join the game!</p>' : 
+                        ''
+                    }
                     
                     <button class="start-button" 
                             onclick="startGame()" 
                             ${players.length < minPlayers ? 'disabled' : ''}>
                         ${players.length < minPlayers ? 
                             `Need ${minPlayers - players.length} more player${minPlayers - players.length > 1 ? 's' : ''}` : 
-                            'Start Game'}
+                            '🚀 Start Game'}
                     </button>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #3c3c3c; border-radius: 8px; font-size: 0.9em; color: #ccc;">
+                        <strong>🎮 How to play:</strong><br>
+                        • Run bot.py or other clients to join players<br>
+                        • Need at least ${minPlayers} players to start<br>
+                        • Click "Start Game" when ready<br>
+                        • Watch the snakes battle it out!
+                    </div>
                 </div>
             `;
         }
@@ -487,13 +698,16 @@
             appRoot.innerHTML = `
                 <div class="game-container">
                     <div class="game-canvas-container">
-                        <h3>Game Board</h3>
+                        <h3>🎮 Game Board</h3>
                         <canvas id="game-canvas" width="600" height="600"></canvas>
+                        <div style="text-align: center; margin-top: 10px; color: #ccc; font-size: 0.9em;">
+                            🎯 Watch the snakes battle it out!
+                        </div>
                     </div>
                     <div class="game-info">
-                        <h3>Game Info</h3>
+                        <h3>📊 Game Stats</h3>
                         <div id="game-stats"></div>
-                        <h3>Players</h3>
+                        <h3>🏆 Leaderboard</h3>
                         <ul class="players-list" id="players-list"></ul>
                     </div>
                 </div>
@@ -512,36 +726,71 @@
                 
                 statsContainer.innerHTML = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-                        <div style="background: #3c3c3c; padding: 10px; border-radius: 5px; text-align: center;">
-                            <div style="font-size: 0.8em; color: #ccc;">Tick</div>
-                            <div style="font-size: 1.2em; font-weight: bold;">${gameState.tick}</div>
+                        <div style="background: linear-gradient(135deg, #3c3c3c, #4a4a4a); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #555;">
+                            <div style="font-size: 0.8em; color: #ccc;">⏱️ Tick</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: #4CAF50;">${gameState.tick}</div>
                         </div>
-                        <div style="background: #3c3c3c; padding: 10px; border-radius: 5px; text-align: center;">
-                            <div style="font-size: 0.8em; color: #ccc;">Alive</div>
-                            <div style="font-size: 1.2em; font-weight: bold;">${aliveCount}/${totalCount}</div>
+                        <div style="background: linear-gradient(135deg, #3c3c3c, #4a4a4a); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #555;">
+                            <div style="font-size: 0.8em; color: #ccc;">💖 Alive</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: ${aliveCount > 1 ? '#4CAF50' : '#FF6B6B'};">${aliveCount}/${totalCount}</div>
                         </div>
-                        <div style="background: #3c3c3c; padding: 10px; border-radius: 5px; text-align: center;">
-                            <div style="font-size: 0.8em; color: #ccc;">Fruits</div>
-                            <div style="font-size: 1.2em; font-weight: bold;">${gameState.fruits.length}</div>
+                        <div style="background: linear-gradient(135deg, #3c3c3c, #4a4a4a); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #555;">
+                            <div style="font-size: 0.8em; color: #ccc;">🍎 Fruits</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: #FF69B4;">${gameState.fruits.length}</div>
                         </div>
-                        <div style="background: #3c3c3c; padding: 10px; border-radius: 5px; text-align: center;">
-                            <div style="font-size: 0.8em; color: #ccc;">Longest</div>
-                            <div style="font-size: 1.2em; font-weight: bold;">${longestSnake}</div>
+                        <div style="background: linear-gradient(135deg, #3c3c3c, #4a4a4a); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #555;">
+                            <div style="font-size: 0.8em; color: #ccc;">👑 Longest</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: #FFD700;">${longestSnake}</div>
                         </div>
                     </div>
                 `;
             }
 
-            // Update players list
+            // Update players list with sorting and enhanced styling
             const playersList = document.getElementById('players-list');
             if (playersList) {
-                const playersHtml = Object.values(gameState.snakes).map(snake => {
-                    const deadClass = snake.is_alive ? '' : 'player-dead';
+                // Sort players: alive first (by length desc), then dead (by length desc)
+                const sortedSnakes = Object.values(gameState.snakes).sort((a, b) => {
+                    // First priority: alive status (alive snakes first)
+                    if (a.is_alive !== b.is_alive) {
+                        return b.is_alive - a.is_alive; // alive (true=1) comes before dead (false=0)
+                    }
+                    
+                    // Second priority: length (descending)
+                    if (b.length !== a.length) {
+                        return b.length - a.length;
+                    }
+                    
+                    // Third priority: stable order by player ID
+                    return a.id.localeCompare(b.id);
+                });
+                
+                // Count alive snakes for proper ranking
+                let aliveRank = 0;
+                
+                const playersHtml = sortedSnakes.map((snake, index) => {
+                    const deadClass = snake.is_alive ? '' : 'dead';
+                    const playerColor = getPlayerColor(snake.color_index);
+                    const nameColor = snake.is_alive ? playerColor : '#888888';
+                    const borderColor = snake.is_alive ? playerColor : 'transparent';
+                    
+                    let rankElement = '';
+                    if (snake.is_alive) {
+                        if (aliveRank < 3) {
+                            const rankClasses = ['first', 'second', 'third'];
+                            rankElement = `<div class="player-rank visible ${rankClasses[aliveRank]}">${aliveRank + 1}</div>`;
+                        }
+                        aliveRank++;
+                    }
+                    
                     return `
-                        <li class="player-item">
-                            <div class="player-color" style="background-color: ${getPlayerColor(snake.color_index)}; opacity: ${snake.is_alive ? 1 : 0.5}"></div>
-                            <span class="player-name ${deadClass}">${escapeHtml(snake.player_name)}</span>
-                            <span class="player-length">Length: ${snake.length}</span>
+                        <li class="player-item ${deadClass}" style="border-left-color: ${borderColor};">
+                            ${rankElement}
+                            <div class="player-color ${deadClass}" style="background-color: ${playerColor}"></div>
+                            <div class="player-info">
+                                <span class="player-name ${deadClass}" style="color: ${nameColor}" title="${escapeHtml(snake.player_name)}">${escapeHtml(snake.player_name)}${!snake.is_alive ? ' 💀' : ''}</span>
+                                <span class="player-length ${deadClass}">${snake.is_alive ? '🍎' : '💀'} ${snake.length}</span>
+                            </div>
                         </li>
                     `;
                 }).join('');
@@ -556,40 +805,84 @@
         function showGameEnded(winner, finalState) {
             const winnerMessage = winner ? 
                 `🏆 ${escapeHtml(winner.name)} Wins! 🏆` : 
-                'Game Ended - No Winner';
+                '⚔️ Game Ended - No Winner ⚔️';
             
-            // Add winner announcement at the top
+            // Add winner announcement with enhanced animation
             const announcement = document.createElement('div');
             announcement.style.cssText = `
                 background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
                 color: #000;
                 padding: 20px;
-                border-radius: 10px;
+                border-radius: 15px;
                 text-align: center;
-                font-size: 1.5em;
+                font-size: 1.8em;
                 font-weight: bold;
                 margin-bottom: 20px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+                animation: bounce 0.8s ease-out, pulse 2s ease-in-out infinite 1s;
+                border: 3px solid #FFF;
+                position: relative;
+                overflow: hidden;
             `;
-            announcement.textContent = winnerMessage;
+            
+            // Add sparkle effect
+            announcement.innerHTML = `
+                <div style="position: relative; z-index: 2;">${winnerMessage}</div>
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%); animation: sparkle 3s linear infinite;"></div>
+            `;
             
             appRoot.insertBefore(announcement, appRoot.firstChild);
             
             // Update the final game state
             updateGame(finalState);
+            
+            // Add celebration particles effect
+            if (winner) {
+                createCelebrationEffect();
+            }
+        }
+        
+        function createCelebrationEffect() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: fixed;
+                        width: 10px;
+                        height: 10px;
+                        background: ${['#FFD700', '#FF69B4', '#4CAF50', '#FF6B6B'][i % 4]};
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 10000;
+                        left: ${Math.random() * window.innerWidth}px;
+                        top: -10px;
+                        animation: fall 3s linear forwards;
+                    `;
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 3000);
+                }, i * 100);
+            }
         }
 
         function showError(message) {
+            console.error('💥 Displaying error to user:', message);
             appRoot.innerHTML = `
                 <div style="text-align: center; padding: 40px;">
                     <h2>❌ Error</h2>
                     <div class="error-message">${escapeHtml(message)}</div>
-                    <button class="start-button" onclick="location.reload()">Reload Page</button>
+                    <button class="start-button" onclick="location.reload()">🔄 Reload Page</button>
+                    <button class="control-button" onclick="reconnect()" style="margin-left: 10px;">🔌 Reconnect</button>
                 </div>
             `;
         }
 
-        // Game rendering
+        // Track previous game state for animations
+        let previousGameState = null;
+        let fruitAnimations = new Map();
+        let eatenFruitAnimations = [];
+        
+        // Game rendering with animations
         function renderGame(gameState) {
             const canvas = document.getElementById('game-canvas');
             if (!canvas) return;
@@ -622,22 +915,102 @@
             }
             ctx.stroke();
             
-            // Draw fruits
-            gameState.fruits.forEach(fruit => {
+            // Handle fruit animations and eaten fruits
+            if (previousGameState) {
+                handleFruitAnimations(gameState, previousGameState);
+            }
+            
+            // Draw animated fruits
+            const currentTime = Date.now();
+            gameState.fruits.forEach((fruit, index) => {
+                const fruitKey = `${fruit.position.x}-${fruit.position.y}`;
+                if (!fruitAnimations.has(fruitKey)) {
+                    fruitAnimations.set(fruitKey, { startTime: currentTime, bounceOffset: index * 500 });
+                }
+                
+                const animation = fruitAnimations.get(fruitKey);
+                const animationTime = (currentTime - animation.startTime + animation.bounceOffset) / 1000;
+                
                 const x = fruit.position.x * cellSize + cellSize / 2;
                 const y = fruit.position.y * cellSize + cellSize / 2;
                 
-                ctx.fillStyle = '#FF1493';
+                // Bouncing animation
+                const bounce = Math.sin(animationTime * 4) * 2;
+                const scale = 1 + Math.sin(animationTime * 6) * 0.1;
+                const rotation = animationTime * 0.5;
+                
+                ctx.save();
+                ctx.translate(x, y + bounce);
+                ctx.scale(scale, scale);
+                ctx.rotate(rotation);
+                
+                // Draw realistic apple with proper apple shape
+                const radius = cellSize / 3;
+                
+                // Apple body - use proper apple shape (wider at top, narrower at bottom)
+                const appleGradient = ctx.createRadialGradient(-radius/3, -radius/4, 0, 0, 0, radius);
+                appleGradient.addColorStop(0, '#FF7F7F');
+                appleGradient.addColorStop(0.4, '#FF4444');
+                appleGradient.addColorStop(0.8, '#DD2222');
+                appleGradient.addColorStop(1, '#BB1111');
+                
+                ctx.fillStyle = appleGradient;
                 ctx.beginPath();
-                ctx.arc(x, y, cellSize / 3, 0, 2 * Math.PI);
+                // Create apple shape using bezier curves
+                ctx.moveTo(0, -radius * 0.8);
+                ctx.quadraticCurveTo(-radius * 0.7, -radius * 0.3, -radius * 0.8, radius * 0.2);
+                ctx.quadraticCurveTo(-radius * 0.6, radius * 0.9, 0, radius * 0.9);
+                ctx.quadraticCurveTo(radius * 0.6, radius * 0.9, radius * 0.8, radius * 0.2);
+                ctx.quadraticCurveTo(radius * 0.7, -radius * 0.3, 0, -radius * 0.8);
+                ctx.closePath();
                 ctx.fill();
                 
-                // Add highlight
-                ctx.fillStyle = '#FFFFFF';
+                // Apple dimple at top
+                ctx.fillStyle = '#AA1111';
                 ctx.beginPath();
-                ctx.arc(x - cellSize / 9, y - cellSize / 9, cellSize / 12, 0, 2 * Math.PI);
+                ctx.ellipse(0, -radius * 0.7, radius * 0.2, radius * 0.1, 0, 0, 2 * Math.PI);
                 ctx.fill();
+                
+                // Apple highlight (curved to follow apple shape)
+                ctx.fillStyle = '#FFDDDD';
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.ellipse(-radius/3, -radius/6, radius/4, radius/2.5, -0.4, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                // Secondary smaller highlight
+                ctx.fillStyle = '#FFFFFF';
+                ctx.globalAlpha = 0.4;
+                ctx.beginPath();
+                ctx.ellipse(-radius/2.5, -radius/3, radius/8, radius/6, -0.3, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                // Apple stem (brown/dark)
+                ctx.fillStyle = '#654321';
+                ctx.beginPath();
+                ctx.ellipse(0, -radius * 0.8, radius/8, radius/3, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Apple leaf (green with vein)
+                ctx.fillStyle = '#32CD32';
+                ctx.beginPath();
+                ctx.ellipse(radius/3, -radius * 0.7, radius/3, radius/5, 0.7, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Leaf vein
+                ctx.strokeStyle = '#228B22';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(radius/6, -radius * 0.75);
+                ctx.lineTo(radius/2, -radius * 0.65);
+                ctx.stroke();
+                ctx.restore();
             });
+            
+            // Draw eaten fruit animations
+            drawEatenFruitAnimations(ctx, cellSize, currentTime);
             
             // Draw snakes
             Object.values(gameState.snakes).forEach(snake => {
@@ -647,7 +1020,7 @@
                 snake.body.forEach((pos, index) => {
                     const x = pos.x * cellSize;
                     const y = pos.y * cellSize;
-                    const padding = index === 0 ? 1 : 2; // Less padding for head
+                    const padding = index === 0 ? 1 : 2;
                     
                     ctx.fillStyle = hexToRgba(color, alpha);
                     ctx.fillRect(
@@ -664,17 +1037,83 @@
                         const eyeOffsetX = cellSize / 4;
                         const eyeOffsetY = cellSize / 3;
                         
-                        // Left eye
                         ctx.beginPath();
                         ctx.arc(x + eyeOffsetX, y + eyeOffsetY, eyeSize, 0, 2 * Math.PI);
                         ctx.fill();
                         
-                        // Right eye
                         ctx.beginPath();
                         ctx.arc(x + cellSize - eyeOffsetX, y + eyeOffsetY, eyeSize, 0, 2 * Math.PI);
                         ctx.fill();
                     }
                 });
+            });
+            
+            previousGameState = JSON.parse(JSON.stringify(gameState));
+        }
+        
+        function handleFruitAnimations(currentState, previousState) {
+            // Find eaten fruits
+            const currentFruitPositions = new Set(currentState.fruits.map(f => `${f.position.x}-${f.position.y}`));
+            const previousFruitPositions = new Set(previousState.fruits.map(f => `${f.position.x}-${f.position.y}`));
+            
+            // Remove animations for fruits that no longer exist
+            for (let [key, _] of fruitAnimations) {
+                if (!currentFruitPositions.has(key)) {
+                    fruitAnimations.delete(key);
+                    
+                    // If this fruit was in the previous state, it was eaten
+                    if (previousFruitPositions.has(key)) {
+                        const [x, y] = key.split('-').map(Number);
+                        eatenFruitAnimations.push({
+                            x: x,
+                            y: y,
+                            startTime: Date.now(),
+                            duration: 1000
+                        });
+                    }
+                }
+            }
+        }
+        
+        function drawEatenFruitAnimations(ctx, cellSize, currentTime) {
+            eatenFruitAnimations = eatenFruitAnimations.filter(animation => {
+                const elapsed = currentTime - animation.startTime;
+                if (elapsed > animation.duration) return false;
+                
+                const progress = elapsed / animation.duration;
+                const x = animation.x * cellSize + cellSize / 2;
+                const y = animation.y * cellSize + cellSize / 2;
+                
+                ctx.save();
+                ctx.translate(x, y);
+                
+                // Expanding circle effect with apple colors
+                const radius = cellSize * progress * 2;
+                const alpha = 1 - progress;
+                
+                ctx.strokeStyle = `rgba(231, 76, 60, ${alpha})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Apple crumb particles effect
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = progress * cellSize * 1.5;
+                    const particleX = Math.cos(angle) * distance;
+                    const particleY = Math.sin(angle) * distance;
+                    
+                    // Alternate between red apple bits and green leaf bits
+                    const color = i % 2 === 0 ? `rgba(231, 76, 60, ${alpha})` : `rgba(34, 139, 34, ${alpha})`;
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(particleX, particleY, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+                return true;
             });
         }
 
@@ -702,6 +1141,16 @@
 
         // Global functions for buttons
         window.startGame = function() {
+            console.log('🚀 Starting game...');
+            
+            // Add loading animation to start button
+            const startButton = document.querySelector('.start-button');
+            if (startButton) {
+                startButton.innerHTML = '⏳ Starting Game...';
+                startButton.disabled = true;
+                startButton.style.animation = 'pulse 1s infinite';
+            }
+            
             sendMessage({ type: 'StartGame' });
         };
 

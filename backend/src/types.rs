@@ -389,7 +389,7 @@ impl GameRoom {
             id,
             name,
             color_index,
-            is_ready: false,
+            is_ready: true,
         };
 
         self.players.insert(id, player);
@@ -410,18 +410,25 @@ impl GameRoom {
     }
 
     /// Check if all alive players have submitted moves
-    pub fn all_moves_submitted(&self) -> bool {
-        let alive_players: Vec<_> = self
-            .game_state
-            .snakes
-            .values()
-            .filter(|s| s.is_alive)
-            .map(|s| s.id)
-            .collect();
+    pub fn all_moves_submitted(&self, current_game_state: &GameState) -> bool {
+        if current_game_state.is_running {
+            // During game, check alive snakes from current engine state
+            let alive_players: Vec<_> = current_game_state
+                .snakes
+                .values()
+                .filter(|s| s.is_alive)
+                .map(|s| s.id)
+                .collect();
 
-        alive_players
-            .iter()
-            .all(|id| self.pending_moves.contains_key(id))
+            alive_players
+                .iter()
+                .all(|id| self.pending_moves.contains_key(id))
+        } else {
+            // Before game starts, check against all players in lobby
+            self.players
+                .keys()
+                .all(|id| self.pending_moves.contains_key(id))
+        }
     }
 }
 
@@ -438,7 +445,6 @@ pub enum GameEvent {
     PlayerJoined(Uuid, String),
     PlayerLeft(Uuid),
     GameStarted,
-    MovesSubmitted,
     GameTick,
     GameEnded(Option<Uuid>),
 }

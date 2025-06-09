@@ -21,7 +21,7 @@ use futures_util::{sink::SinkExt, stream::StreamExt};
 use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::Duration};
 use tokio::{
     sync::{broadcast, mpsc, RwLock},
-    time::interval,
+
 };
 use tower_http::{cors::CorsLayer, services::ServeDir};
 use tracing::{error, info, warn};
@@ -233,7 +233,8 @@ async fn serve_openapi_spec() -> impl IntoResponse {
     )
 )]
 async fn websocket_documentation() -> impl IntoResponse {
-    Html(r#"
+    Html(
+        r#"
         <!DOCTYPE html>
         <html>
         <head>
@@ -260,20 +261,22 @@ async fn websocket_documentation() -> impl IntoResponse {
             <p><a href="/docs">← Back to API Documentation</a></p>
         </body>
         </html>
-    "#)
+    "#,
+    )
 }
 
-/// WebSocket GUI endpoint documentation  
+/// WebSocket GUI endpoint documentation
 #[utoipa::path(
     get,
     path = "/docs/websocket/gui",
-    tag = "websocket", 
+    tag = "websocket",
     responses(
         (status = 200, description = "WebSocket GUI endpoint documentation", content_type = "text/html")
     )
 )]
 async fn gui_documentation() -> impl IntoResponse {
-    Html(r#"
+    Html(
+        r#"
         <!DOCTYPE html>
         <html>
         <head>
@@ -297,7 +300,8 @@ async fn gui_documentation() -> impl IntoResponse {
             <p><a href="/docs">← Back to API Documentation</a></p>
         </body>
         </html>
-    "#)
+    "#,
+    )
 }
 
 /// WebSocket handler for player connections
@@ -357,8 +361,8 @@ async fn handle_player_connection(socket: WebSocket, player_name: String, state:
         player_name: player_name.clone(),
     });
 
-    // Broadcast lobby state update
-    broadcast_lobby_state(&state).await;
+    // Notify that a player joined
+    let _ = state.event_sender.send(GameEvent::PlayerJoined(player_id, player_name.clone()));
 
     // Spawn task to handle outgoing messages
     tokio::spawn(async move {
@@ -394,7 +398,9 @@ async fn handle_player_connection(socket: WebSocket, player_name: String, state:
                         error!("WebSocket error for player {}: {}", player_name, e);
                         break;
                     }
-                    _ => {}
+                    Some(Ok(Message::Binary(_))) | Some(Ok(Message::Ping(_))) | Some(Ok(Message::Pong(_))) => {
+                        // Ignore binary, ping, and pong messages
+                    }
                 }
             }
 
@@ -408,6 +414,16 @@ async fn handle_player_connection(socket: WebSocket, player_name: String, state:
                                 game_state: engine.state.clone(),
                                 your_snake_id: player_id,
                             });
+                            
+                            // Send initial move request
+                            if engine.is_snake_alive(&player_id) {
+                                let valid_directions = engine.get_valid_moves(&player_id);
+                                info!("🎯 Sending initial move request to player {}", player_name);
+                                let _ = tx.send(ServerMessage::MoveRequest {
+                                    valid_directions,
+                                    time_limit_ms: MOVE_TIMEOUT_MS,
+                                });
+                            }
                         }
                     }
                     GameEvent::GameTick => {
@@ -435,7 +451,9 @@ async fn handle_player_connection(socket: WebSocket, player_name: String, state:
                             final_state: engine.state.clone(),
                         });
                     }
-                    _ => {}
+                    GameEvent::PlayerJoined(_, _) | GameEvent::PlayerLeft(_) => {
+                        // These events don't affect individual player connections
+                    }
                 }
             }
         }
@@ -453,12 +471,11 @@ async fn handle_player_connection(socket: WebSocket, player_name: String, state:
     }
 
     let _ = state.event_sender.send(GameEvent::PlayerLeft(player_id));
-    broadcast_lobby_state(&state).await;
 }
 
 /// Handle GUI WebSocket connection
 async fn handle_gui_connection(socket: WebSocket, state: AppState) {
-    info!("GUI connected");
+    info!("🎮 GUI connected - initializing interface");
 
     let (mut ws_sender, mut ws_receiver) = socket.split();
     let (tx, mut rx) = mpsc::unbounded_channel::<ServerMessage>();
@@ -474,8 +491,15 @@ async fn handle_gui_connection(socket: WebSocket, state: AppState) {
         }
     });
 
-    // Send initial lobby state
-    broadcast_lobby_state(&state).await;
+
+    // Send initial lobby state directly to this GUI connection
+    {
+        let room = state.game_room.read().await;
+        let players: Vec<LobbyPlayer> = room.players.values().cloned().collect();
+        info!("📤 Sending initial lobby state with {} players", players.len());
+        let message = ServerMessage::LobbyState { players };
+        let _ = tx.send(message);
+    }
 
     // Handle incoming messages and events
     let mut event_receiver = state.event_sender.subscribe();
@@ -485,7 +509,7 @@ async fn handle_gui_connection(socket: WebSocket, state: AppState) {
             msg = ws_receiver.next() => {
                 match msg {
                     Some(Ok(Message::Text(text))) => {
-                        if let Err(e) = handle_gui_message(text, &state).await {
+                        if let Err(e) = handle_gui_message(text, &state, &tx).await {
                             error!("Error handling GUI message: {}", e);
                         }
                     }
@@ -505,9 +529,14 @@ async fn handle_gui_connection(socket: WebSocket, state: AppState) {
             Ok(event) = event_receiver.recv() => {
                 match event {
                     GameEvent::PlayerJoined(_, _) | GameEvent::PlayerLeft(_) => {
-                        broadcast_lobby_state(&state).await;
+                        let room = state.game_room.read().await;
+                        let players: Vec<LobbyPlayer> = room.players.values().cloned().collect();
+                        info!("👥 Lobby updated: {} players", players.len());
+                        let message = ServerMessage::LobbyState { players };
+                        let _ = tx.send(message);
                     }
                     GameEvent::GameStarted => {
+                        info!("🚀 Game started! Sending initial game state to GUI");
                         let engine = state.game_engine.read().await;
                         let _ = tx.send(ServerMessage::GameUpdate {
                             game_state: engine.state.clone(),
@@ -515,6 +544,9 @@ async fn handle_gui_connection(socket: WebSocket, state: AppState) {
                     }
                     GameEvent::GameTick => {
                         let engine = state.game_engine.read().await;
+                        if engine.state.tick % 10 == 0 {
+                            info!("⏱️  Game tick {}", engine.state.tick);
+                        }
                         let _ = tx.send(ServerMessage::GameUpdate {
                             game_state: engine.state.clone(),
                         });
@@ -529,7 +561,6 @@ async fn handle_gui_connection(socket: WebSocket, state: AppState) {
                             final_state: engine.state.clone(),
                         });
                     }
-                    _ => {}
                 }
             }
         }
@@ -541,24 +572,45 @@ async fn handle_player_message(text: String, player_id: Uuid, state: &AppState) 
     let message: ClientMessage = serde_json::from_str(&text)?;
 
     match message {
+        ClientMessage::JoinLobby { player_name } => {
+            // Add or update player in the game room
+            let mut room = state.game_room.write().await;
+            match room.add_player(player_id, player_name.clone()) {
+                Ok(_) => {
+                    // Player successfully added or updated
+                }
+                Err(error) => {
+                    // Send error
+                    if let Some(connection) = state.connections.read().await.get(&player_id) {
+                        let _ = connection.sender.send(ServerMessage::Error {
+                            message: format!("Error {}", error),
+                        });
+                    }
+                }
+            }
+            drop(room);
+
+            // Broadcast updated lobby state to all connections (only once)
+            broadcast_lobby_state(state).await;
+        }
         ClientMessage::SubmitMove { direction } => {
             let mut room = state.game_room.write().await;
             room.pending_moves.insert(player_id, direction);
+            info!("🎮 Player {} submitted move: {:?}", player_id, direction);
 
-            // Check if all moves are submitted
-            if room.all_moves_submitted() {
-                let _ = state.event_sender.send(GameEvent::MovesSubmitted);
-            }
+            // Note: We don't send MovesSubmitted event anymore, 
+            // the game loop uses polling to check for all moves
         }
         ClientMessage::Ping => {
             if let Some(connection) = state.connections.read().await.get(&player_id) {
                 let _ = connection.sender.send(ServerMessage::Pong);
             }
         }
-        _ => {
-            return Err(GameError::InvalidMove(
-                "Invalid message type for player".to_string(),
-            ));
+        message => {
+            return Err(GameError::InvalidMove(format!(
+                "Invalid message type for player: {:?}",
+                message
+            )));
         }
     }
 
@@ -566,19 +618,42 @@ async fn handle_player_message(text: String, player_id: Uuid, state: &AppState) 
 }
 
 /// Handle GUI messages
-async fn handle_gui_message(text: String, state: &AppState) -> GameResult<()> {
+async fn handle_gui_message(text: String, state: &AppState, tx: &mpsc::UnboundedSender<ServerMessage>) -> GameResult<()> {
     let message: ClientMessage = serde_json::from_str(&text)?;
 
     match message {
         ClientMessage::StartGame => {
             let room = state.game_room.read().await;
-            if room.can_start_game() {
+            info!("🎮 GUI requested game start. Current players: {}", room.players.len());
+            
+            // Check if we have enough players to start (players are ready by default)
+            if room.players.len() >= MIN_PLAYERS {
+                drop(room);
+                
+                let room = state.game_room.read().await;
                 // Initialize game engine
-                let mut engine = state.game_engine.write().await;
-                engine.initialize_game(&room.players)?;
+                {
+                    let mut engine = state.game_engine.write().await;
+                    info!("🎯 Initializing game with {} players", room.players.len());
+                    engine.initialize_game(&room.players)?;
+                    info!("🐍 Game engine initialized successfully");
+                }
 
                 let _ = state.event_sender.send(GameEvent::GameStarted);
+                info!("📡 GameStarted event sent");
+            } else {
+                let error_msg = format!("Need at least {} players to start (current: {})", MIN_PLAYERS, room.players.len());
+                info!("❌ {}", error_msg);
+                let _ = tx.send(ServerMessage::Error {
+                    message: error_msg,
+                });
             }
+        }
+        ClientMessage::JoinLobby { .. } => {
+            // GUI should not be able to add players - only real clients can join
+            let _ = tx.send(ServerMessage::Error {
+                message: "GUI cannot add players directly. Use bot.py or other clients to join.".to_string(),
+            });
         }
         _ => {
             return Err(GameError::InvalidMove(
@@ -590,13 +665,14 @@ async fn handle_gui_message(text: String, state: &AppState) -> GameResult<()> {
     Ok(())
 }
 
-/// Broadcast lobby state to all connections
+/// Broadcast lobby state to all connections including GUI
 async fn broadcast_lobby_state(state: &AppState) {
     let room = state.game_room.read().await;
     let players: Vec<LobbyPlayer> = room.players.values().cloned().collect();
 
     let message = ServerMessage::LobbyState { players };
 
+    // Send to all player connections
     let connections = state.connections.read().await;
     for connection in connections.values() {
         let _ = connection.sender.send(message.clone());
@@ -605,41 +681,104 @@ async fn broadcast_lobby_state(state: &AppState) {
 
 /// Main game loop that processes ticks
 async fn game_loop(state: AppState) {
-    let mut interval = interval(Duration::from_millis(GAME_TICK_DURATION_MS));
-
-    info!("Game loop started");
+    let mut event_receiver = state.event_sender.subscribe();
+    
+    info!("Game loop started - waiting for game events");
 
     loop {
-        interval.tick().await;
-
-        // Check if game is running and all moves are ready
-        let should_process_tick = {
-            let room = state.game_room.read().await;
-            let engine = state.game_engine.read().await;
-            engine.state.is_running && room.all_moves_submitted()
-        };
-
-        if should_process_tick {
-            // Process game tick
-            let moves = {
-                let mut room = state.game_room.write().await;
-                let moves = room.pending_moves.clone();
-                room.pending_moves.clear();
-                moves
-            };
-
-            let mut engine = state.game_engine.write().await;
-            if let Err(e) = engine.process_tick(moves) {
-                error!("Error processing game tick: {}", e);
-                continue;
-            }
-
-            // Check if game ended
-            if !engine.state.is_running {
-                let winner_id = engine.state.winner;
-                let _ = state.event_sender.send(GameEvent::GameEnded(winner_id));
-            } else {
-                let _ = state.event_sender.send(GameEvent::GameTick);
+        if let Ok(event) = event_receiver.recv().await {
+            match event {
+                GameEvent::GameStarted => {
+                    info!("🚀 Game started - beginning tick processing");
+                    
+                    // Run the game loop
+                    loop {
+                        let tick_start_time = tokio::time::Instant::now();
+                        
+                        // Check if game is still running
+                        let is_running = {
+                            let engine = state.game_engine.read().await;
+                            engine.state.is_running
+                        };
+                        
+                        if !is_running {
+                            break;
+                        }
+                        
+                        info!("⏳ Waiting for player moves (5 second timeout)...");
+                        
+                        // Wait for moves with 5-second timeout
+                        let moves = loop {
+                            // Check if all moves are submitted
+                            let all_submitted = {
+                                let room = state.game_room.read().await;
+                                let engine = state.game_engine.read().await;
+                                room.all_moves_submitted(&engine.state)
+                            };
+                            
+                            if all_submitted {
+                                info!("✅ All moves submitted");
+                                let mut room = state.game_room.write().await;
+                                let moves = room.pending_moves.clone();
+                                room.pending_moves.clear();
+                                break moves;
+                            }
+                            
+                            // Check for timeout
+                            if tick_start_time.elapsed() >= Duration::from_millis(MOVE_TIMEOUT_MS) {
+                                info!("⏰ Move timeout - processing with available moves");
+                                let mut room = state.game_room.write().await;
+                                let moves = room.pending_moves.clone();
+                                room.pending_moves.clear();
+                                break moves;
+                            }
+                            
+                            // Wait a bit before checking again
+                            tokio::time::sleep(Duration::from_millis(50)).await;
+                        };
+                        
+                        // Ensure minimum 200ms delay for UI visibility
+                        let elapsed = tick_start_time.elapsed();
+                        if elapsed < Duration::from_millis(GAME_TICK_DURATION_MS) {
+                            let remaining = Duration::from_millis(GAME_TICK_DURATION_MS) - elapsed;
+                            info!("⏱️ Waiting {}ms for minimum tick duration", remaining.as_millis());
+                            tokio::time::sleep(remaining).await;
+                        }
+                        
+                        // Log submitted moves
+                        info!("🎮 Processing tick with {} moves submitted", moves.len());
+                        for (player_id, direction) in &moves {
+                            info!("  - Player {}: {:?}", player_id, direction);
+                        }
+                        
+                        // Process the game tick
+                        {
+                            let mut engine = state.game_engine.write().await;
+                            if let Err(e) = engine.process_tick(moves) {
+                                error!("❌ Error processing game tick: {}", e);
+                                break;
+                            }
+                            
+                            // Check if game ended
+                            if !engine.state.is_running {
+                                let winner_id = engine.state.winner;
+                                info!("🏁 Game ended! Winner: {:?}", winner_id);
+                                let _ = state.event_sender.send(GameEvent::GameEnded(winner_id));
+                                break;
+                            }
+                        }
+                        
+                        // Send game update
+                        let _ = state.event_sender.send(GameEvent::GameTick);
+                    }
+                }
+                GameEvent::GameEnded(_) => {
+                    info!("🏁 Game ended - stopping game loop");
+                    // Game ended, continue listening for new games
+                }
+                _ => {
+                    // Ignore other events
+                }
             }
         }
     }

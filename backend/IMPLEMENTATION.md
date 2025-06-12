@@ -55,7 +55,7 @@ A real-time multiplayer snake game backend with the following features:
 - **Grid**: 50x50 cells with wraparound boundaries
 - **Players**: 2-8 concurrent players
 - **Movement**: 4 directions (UP, DOWN, LEFT, RIGHT) per 200ms tick
-- **Winning**: Last snake alive OR reach length 300
+- **Winning**: Last snake alive OR reach length 50
 - **Fruit**: (Players - 1) fruits spawning every 5 ticks
 
 ### Collision Detection
@@ -98,7 +98,7 @@ ws://localhost:3000/gui
 
 // Submit move
 {
-  "type": "SubmitMove", 
+  "type": "SubmitMove",
   "direction": "Up" | "Down" | "Left" | "Right"
 }
 
@@ -157,12 +157,12 @@ pub struct AppState {
 // 200ms tick-based game loop
 loop {
     interval.tick().await;
-    
+
     if game_running && all_moves_submitted() {
         let moves = collect_pending_moves();
         engine.process_tick(moves)?;
         broadcast_game_update();
-        
+
         if game_ended() {
             broadcast_game_end();
         }
@@ -175,21 +175,21 @@ loop {
 fn handle_collisions() -> GameResult<()> {
     // 1. Collect all head positions
     let head_positions = collect_snake_heads();
-    
+
     // 2. Check head-to-head collisions
     for (pos, snake_ids) in head_positions {
         if snake_ids.len() > 1 {
             kill_all_snakes(snake_ids);
         }
     }
-    
+
     // 3. Check head-to-body collisions
     for snake in snakes {
         if head_collides_with_any_body(snake) {
             kill_snake(snake);
         }
     }
-    
+
     Ok(())
 }
 ```
@@ -198,7 +198,7 @@ fn handle_collisions() -> GameResult<()> {
 ```rust
 fn spawn_fruits() -> GameResult<()> {
     let max_fruits = player_count - 1;
-    
+
     for timer in fruit_timers {
         if timer >= FRUIT_SPAWN_DELAY_TICKS {
             if let Ok(position) = find_random_empty_position() {
@@ -207,7 +207,7 @@ fn spawn_fruits() -> GameResult<()> {
             }
         }
     }
-    
+
     Ok(())
 }
 ```
@@ -219,14 +219,14 @@ fn spawn_fruits() -> GameResult<()> {
 function renderGame(gameState) {
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Clear and draw grid
     clearCanvas(ctx);
     drawGrid(ctx);
-    
+
     // Draw fruits
     gameState.fruits.forEach(fruit => drawFruit(ctx, fruit));
-    
+
     // Draw snakes with different styling for alive/dead
     Object.values(gameState.snakes).forEach(snake => {
         drawSnake(ctx, snake, snake.is_alive);
@@ -244,7 +244,7 @@ class SnakeGameClient {
             this.handleMessage(message);
         };
     }
-    
+
     handleMessage(message) {
         switch (message.type) {
             case 'GameUpdate':
@@ -385,7 +385,7 @@ const ws = new WebSocket('ws://localhost:3000/lobby?player_name=JSBot');
 
 ws.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    
+
     if (message.type === 'MoveRequest') {
         // Simple AI: choose random valid direction
         const direction = message.valid_directions[0];
@@ -405,11 +405,11 @@ import json
 
 async def snake_bot():
     uri = "ws://localhost:3000/lobby?player_name=PythonBot"
-    
+
     async with websockets.connect(uri) as websocket:
         async for message in websocket:
             data = json.loads(message)
-            
+
             if data['type'] == 'MoveRequest':
                 # AI logic here
                 direction = data['valid_directions'][0]
@@ -433,7 +433,7 @@ export RUST_LOG=info
 # Game tuning
 export MAX_PLAYERS=8
 export TICK_DURATION=200
-export WINNING_LENGTH=300
+export WINNING_LENGTH=50
 ```
 
 ### Game Constants
@@ -442,7 +442,7 @@ Located in `src/constants.rs`:
 // Easily tunable game parameters
 pub const GRID_WIDTH: usize = 50;
 pub const GRID_HEIGHT: usize = 50;
-pub const WINNING_SNAKE_LENGTH: usize = 300;
+pub const WINNING_SNAKE_LENGTH: usize = 50;
 pub const GAME_TICK_DURATION_MS: u64 = 200;
 pub const MAX_PLAYERS: usize = 8;
 pub const MIN_PLAYERS: usize = 2;

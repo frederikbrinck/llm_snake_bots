@@ -1,5 +1,5 @@
 //! Shared types for the GUI frontend
-//! 
+//!
 //! This module contains type definitions that are shared between the backend
 //! and frontend, ensuring consistency in data structures.
 
@@ -84,12 +84,8 @@ pub struct LobbyPlayer {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum ClientMessage {
-    JoinLobby {
-        player_name: String,
-    },
-    SubmitMove {
-        direction: Direction,
-    },
+    JoinLobby { player_name: String },
+    SubmitMove { direction: Direction },
     StartGame,
     Ping,
 }
@@ -131,10 +127,10 @@ pub mod constants {
     pub const GRID_WIDTH: usize = 50;
     pub const GRID_HEIGHT: usize = 50;
     pub const CELL_SIZE_PX: u32 = 12;
-    pub const WINNING_SNAKE_LENGTH: usize = 300;
+    pub const WINNING_SNAKE_LENGTH: usize = 50;
     pub const MAX_PLAYERS: usize = 8;
     pub const MIN_PLAYERS: usize = 2;
-    
+
     pub const SNAKE_COLORS: [&str; 8] = [
         "#FF6B6B", // Red
         "#4ECDC4", // Teal
@@ -145,7 +141,7 @@ pub mod constants {
         "#FFB347", // Orange
         "#87CEEB", // Sky Blue
     ];
-    
+
     pub const DEAD_SNAKE_ALPHA: f32 = 0.5;
     pub const FRUIT_COLOR: &str = "#FF1493";
     pub const GRID_BACKGROUND_COLOR: &str = "#2C3E50";
@@ -164,17 +160,17 @@ impl JsGameState {
     pub fn tick(&self) -> u64 {
         self.inner.tick
     }
-    
+
     #[wasm_bindgen(getter)]
     pub fn is_running(&self) -> bool {
         self.inner.is_running
     }
-    
+
     #[wasm_bindgen(getter)]
     pub fn grid_width(&self) -> i32 {
         self.inner.grid_width
     }
-    
+
     #[wasm_bindgen(getter)]
     pub fn grid_height(&self) -> i32 {
         self.inner.grid_height

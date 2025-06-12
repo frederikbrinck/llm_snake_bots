@@ -19,9 +19,9 @@ A real-time multiplayer snake game built with Rust, WebSockets, and WASM. Player
 - **Grid Size**: 50x50 cells
 - **Players**: 2-8 players per game
 - **Initial Snake Length**: 1 cell
-- **Winning Conditions**: 
+- **Winning Conditions**:
   - Be the last snake alive, OR
-  - Reach a length of 300 cells
+  - Reach a length of 50 cells
 
 ### Gameplay
 - Each game tick occurs every 200ms
@@ -103,7 +103,7 @@ const ws = new WebSocket('ws://localhost:3000/lobby?player_name=MyBot');
 
 ws.onmessage = (event) => {
   const message = JSON.parse(event.data);
-  
+
   switch (message.type) {
     case 'MoveRequest':
       // Choose direction based on game state
@@ -113,7 +113,7 @@ ws.onmessage = (event) => {
         direction: direction
       }));
       break;
-      
+
     case 'GameUpdate':
       // Process game state update
       updateGameState(message.game_state);
@@ -135,11 +135,11 @@ import json
 
 async def snake_bot():
     uri = "ws://localhost:3000/lobby?player_name=PythonBot"
-    
+
     async with websockets.connect(uri) as websocket:
         async for message in websocket:
             data = json.loads(message)
-            
+
             if data['type'] == 'MoveRequest':
                 # Simple random movement
                 direction = data['valid_directions'][0]

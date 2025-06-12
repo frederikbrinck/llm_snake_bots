@@ -56,7 +56,7 @@ The game ends when either:
 
 * One snake is alive and all other snakes are dead. In that case, the snake that is alive wins.
 
-* One snake becomes reaches a lenght of 300. In that case, the snake of lenght 300 wins.
+* One snake becomes reaches a lenght of 50. In that case, the snake of lenght 50 wins.
 
 ## Fruit
 
@@ -111,7 +111,7 @@ The flow of the API is quite simple and is outlined below:
    their states according to the game play rules.
 
 6. We repeat step 3-6 until a) the player dies, in which case they won't have to submit any more moves, or 2) one snake
-   wins by either being the last one alive, or the having a length of 300. Each of these ticks should have a delay of
+   wins by either being the last one alive, or the having a length of 50. Each of these ticks should have a delay of
    200ms between them, so we can see them update in the GUI.
 
 ## The Graphical User Interface

@@ -8,7 +8,7 @@ pub const GRID_WIDTH: usize = 50;
 pub const GRID_HEIGHT: usize = 50;
 
 /// Snake game rules
-pub const WINNING_SNAKE_LENGTH: usize = 300;
+pub const WINNING_SNAKE_LENGTH: usize = 50;
 pub const INITIAL_SNAKE_LENGTH: usize = 1;
 
 /// Fruit spawning rules
